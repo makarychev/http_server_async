@@ -19,7 +19,7 @@ public:
 	{
 #ifdef WIN32
 		static SimpleLogger m_pLogger("http_server.log");
-#elif
+#else
 		static SimpleLogger m_pLogger("//home//box//http_server.log");
 #endif
 		return m_pLogger;

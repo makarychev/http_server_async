@@ -14,6 +14,7 @@ public:
 	{	
 		try
 		{
+			SimpleLogger::GetInstance().WriteLog("start server");
 			/*boost::asio::ip::tcp::resolver resolver(m_io_service);
 			boost::asio::ip::tcp::resolver::query query(sIp, std::to_string(iPort));
 			boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
@@ -25,7 +26,7 @@ public:
 		{
 			std::string err = "HTTP server creation ERROR:";
 			err += ex.what();
-			std::cout << err << std::endl;
+			SimpleLogger::GetInstance().WriteLog(err);
 		}
 	}
 	~Server(){}
