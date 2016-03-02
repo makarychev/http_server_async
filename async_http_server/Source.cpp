@@ -1,5 +1,5 @@
 #include "Server.h"
-#ifdef linux
+#ifndef WIN32
 #include <unistd.h>
 #endif
 using namespace boost::asio;
@@ -44,9 +44,9 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	#ifdef linux
+#ifndef WIN32
 	if (!fork())
-	#endif
+#endif
 	{
 		Server server(sIp, iPort, sDir);
 		server.Start();
