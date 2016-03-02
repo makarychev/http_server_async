@@ -1,5 +1,6 @@
 #include "HttpSession.h"
 #include <boost/bind.hpp>
+#include "Logger.h"
 
 // since C++11
 //const std::map<unsigned int, std::string>  Service::http_status_table = {  { 200, "200 OK" },  { 404, "404 Not Found" },  { 413, "413 Request Entity Too Large" },  { 500, "500 Server Error" },  { 501, "501 Not Implemented" },  { 505, "505 HTTP Version Not Supported" } }; 
@@ -17,12 +18,13 @@ void HttpSession::start_handling()
 void HttpSession::on_request_line_received(const boost::system::error_code& ec, std::size_t bytes_transferred) 
 {    
 	if (ec != 0) 
-	{      
-		std::cout << "Error occured! Error code = "        << ec.value()        << ". Message: " << ec.message();
+	{   
+		SimpleLogger::GetInstance().WriteLog(std::string("on_request_line_received | Error occured! Error code = " + std::to_string(ec.value()) + ". Message: " + ec.message()));
 		if (ec == asio::error::not_found) 
 		{        
 			// No delimiter has been found in the        
 			// request message.
+			SimpleLogger::GetInstance().WriteLog("on_request_line_received | Error occured! m_response_status_code = 413");
 			m_response_status_code = 413;        
 			send_response();
 			return;      
@@ -30,10 +32,12 @@ void HttpSession::on_request_line_received(const boost::system::error_code& ec, 
 		{        
 			// In case of any other error –        
 			// close the socket and clean up.        
+			SimpleLogger::GetInstance().WriteLog("on_request_line_received | Error occured! on_finish()");
 			on_finish();        
 			return;
 		}
 	}
+	SimpleLogger::GetInstance().WriteLog("on_request_line_received() received");
 	// Parse the request line.    
 	std::string request_line;    
 	std::istream request_stream(&m_request);    
@@ -47,6 +51,7 @@ void HttpSession::on_request_line_received(const boost::system::error_code& ec, 
 	// We only support GET method.    
 	if (request_method.compare("GET") != 0) 
 	{      // Unsupported method.      
+		SimpleLogger::GetInstance().WriteLog("Error occured! request_method.compare(GET) != 0 //// Unsupported method.   ");
 		m_response_status_code = 501;      
 		send_response();
 		return;    
@@ -56,6 +61,7 @@ void HttpSession::on_request_line_received(const boost::system::error_code& ec, 
 	request_line_stream >> request_http_version;
 	if ((request_http_version.compare("HTTP/1.0") != 0) && (request_http_version.compare("HTTP/1.1") != 0))  // todo: 
 	{      // Unsupported HTTP version or bad request.      
+		SimpleLogger::GetInstance().WriteLog("Error occured! HTTP/1.0 //// Unsupported HTTP version or bad request..   ");
 		m_response_status_code = 505;      
 		send_response();
 		return;    
@@ -73,17 +79,19 @@ void HttpSession::on_headers_received(const boost::system::error_code& ec, std::
 {    
 	if (ec != 0) 
 	{      
-		std::cout << "Error occured! Error code = "        << ec.value()        << ". Message: " << ec.message();
+		SimpleLogger::GetInstance().WriteLog(std::string("on_headers_received | Error occured! Error code = " + std::to_string(ec.value()) + ". Message: " + ec.message()));
 		if (ec == asio::error::not_found) 
 		{        
 			// No delimiter has been fonud in the        
 			// request message.
+			SimpleLogger::GetInstance().WriteLog("on_request_line_received | Error occured! m_response_status_code = 413");
 			m_response_status_code = 413;        
 			send_response();        
 			return;      
 		} else {        
 			// In case of any other error - close the        
 			// socket and clean up.        
+			SimpleLogger::GetInstance().WriteLog("on_request_line_received | Error occured! on_finish()");
 			on_finish();        
 			return;      
 		}    
@@ -109,11 +117,13 @@ void HttpSession::on_headers_received(const boost::system::error_code& ec, std::
 
 void HttpSession::process_request() 
 {    
+	SimpleLogger::GetInstance().WriteLog("HttpSession::process_request()");
 	// Read file.    
 	std::string resource_file_path = m_sDir + m_requested_resource;
 	if (!boost::filesystem::exists(resource_file_path)) 
 	{      
 		// Resource not found.      
+		SimpleLogger::GetInstance().WriteLog("HttpSession::process_request() - Resource not found");
 		m_response_status_code = 404;
 		return;    
 	}
@@ -122,6 +132,7 @@ void HttpSession::process_request()
 	{      
 		// Could not open file.       
 		// Something bad has happened.      
+		SimpleLogger::GetInstance().WriteLog("HttpSession::process_request() - Could not open file");
 		m_response_status_code = 500;
 		return;    
 	}
@@ -136,6 +147,7 @@ void HttpSession::process_request()
 
 void HttpSession::send_response()  
 {    
+	SimpleLogger::GetInstance().WriteLog("HttpSession::send_response()");
 	m_sock.shutdown(asio::ip::tcp::socket::shutdown_receive);
 	auto status_line = http_status_table.at(m_response_status_code);
 	m_response_status_line = std::string("HTTP/1.0 ") + status_line + "\r\n";
@@ -160,7 +172,7 @@ void HttpSession::on_response_sent(const boost::system::error_code& ec, std::siz
 {    
 	if (ec != 0) 
 	{      
-		std::cout << "Error occured! Error code = "        << ec.value()        << ". Message: " << ec.message();
+		SimpleLogger::GetInstance().WriteLog(std::string("on_response_sent | Error occured! Error code = " + std::to_string(ec.value()) + ". Message: " + ec.message()));
 	}
 	m_sock.shutdown(asio::ip::tcp::socket::shutdown_both);
 	on_finish();  

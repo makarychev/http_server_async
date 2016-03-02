@@ -1,21 +1,15 @@
 #include "Server.h"
+#include "Logger.h"
 #ifndef WIN32
 #include <unistd.h>
 #endif
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-int iPort = 12345;
-
-#include <iostream>
-using namespace std;
-
 #define ARG_IP		0x01
 #define ARG_PORT	0x02
 #define ARG_DIR		0x04
 #define ARG_ALL		(ARG_IP | ARG_PORT | ARG_DIR)
-
-
 
 int main(int argc, char** argv)
 {
@@ -48,8 +42,10 @@ int main(int argc, char** argv)
 	if (!fork())
 #endif
 	{
+		SimpleLogger::GetInstance().WriteLog("HTTP server started");
 		Server server(sIp, iPort, sDir);
 		server.Start();
+		SimpleLogger::GetInstance().WriteLog("HTTP server stopped");
 	}	
 	
 	return 0;
