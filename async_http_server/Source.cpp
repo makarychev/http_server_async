@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	}
 
 	#ifdef linux
-	if (fork())
+	if (!fork())
 	#endif
 	{
 		Server server(sIp, iPort, sDir);
