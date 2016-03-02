@@ -1,5 +1,7 @@
 #include "Server.h"
-
+#ifdef linux
+#include <unistd.h>
+#endif
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
