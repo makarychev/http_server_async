@@ -2,6 +2,7 @@
 #include "HttpSession.h"
 #include <boost/bind.hpp>
 #include <iostream>
+#include "Logger.h"
 
 class Server : private boost::noncopyable
 {
@@ -42,6 +43,7 @@ private:
 	{
 		if (!e)
 		{
+			SimpleLogger::GetInstance().WriteLog("new client accepted");
 			m_new_service->start_handling();
 
 			m_new_service = HttpSession::create(m_io_service, m_sDir);
