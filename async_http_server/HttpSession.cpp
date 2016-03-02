@@ -57,6 +57,7 @@ void HttpSession::on_request_line_received(const boost::system::error_code& ec, 
 		return;    
 	}
 	request_line_stream >> m_requested_resource;
+	SimpleLogger::GetInstance().WriteLog(request_line);
 	std::string request_http_version;    
 	request_line_stream >> request_http_version;
 	if ((request_http_version.compare("HTTP/1.0") != 0) && (request_http_version.compare("HTTP/1.1") != 0))  // todo: 
@@ -120,6 +121,7 @@ void HttpSession::process_request()
 	SimpleLogger::GetInstance().WriteLog("HttpSession::process_request()");
 	// Read file.    
 	std::string resource_file_path = m_sDir + m_requested_resource;
+	SimpleLogger::GetInstance().WriteLog("HttpSession::process_request() - " + resource_file_path);
 	if (!boost::filesystem::exists(resource_file_path)) 
 	{      
 		// Resource not found.      
