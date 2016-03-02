@@ -1,6 +1,9 @@
 #include "HttpSession.h"
 #include <boost/bind.hpp>
 #include "Logger.h"
+#include <string>
+
+
 
 // since C++11
 //const std::map<unsigned int, std::string>  Service::http_status_table = {  { 200, "200 OK" },  { 404, "404 Not Found" },  { 413, "413 Request Entity Too Large" },  { 500, "500 Server Error" },  { 501, "501 Not Implemented" },  { 505, "505 HTTP Version Not Supported" } }; 
@@ -57,6 +60,13 @@ void HttpSession::on_request_line_received(const boost::system::error_code& ec, 
 		return;    
 	}
 	request_line_stream >> m_requested_resource;
+	std::size_t found = m_requested_resource.find('?');
+	if (found != std::string::npos)
+	{
+		char buffer[255] = {0};
+		m_requested_resource.copy(buffer, found, 0);
+		m_requested_resource = buffer;
+	}
 	SimpleLogger::GetInstance().WriteLog(request_line);
 	std::string request_http_version;    
 	request_line_stream >> request_http_version;

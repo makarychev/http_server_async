@@ -6,9 +6,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <fstream> 
-#include <atomic> 
-#include <thread> 
-#include <iostream>
+//#include <atomic> 
+//#include <thread> 
 
 
 class HttpSession : public boost::enable_shared_from_this<HttpSession>
